@@ -7,10 +7,10 @@
 <script lang="ts">
 import Globe from 'globe.gl';
 import { defineComponent } from 'vue'
-import type {GlobeInstance} from 'globe.gl';
 import { useGameStore } from '@/stores/Game';
 import { mapActions, mapState } from "pinia";
 import Loader from "@/components/Loader.vue";
+import type {GlobeInstance} from 'globe.gl';
 
 type Data = {
   myGlobe: GlobeInstance | null,
@@ -18,6 +18,7 @@ type Data = {
 
 export default defineComponent({
   components: { Loader, Globe},
+  emits: ['countryClick'],
   data(): Data{
     return {
       myGlobe: null,
@@ -43,16 +44,13 @@ export default defineComponent({
     ...mapState(useGameStore, ['currentGuesses', 'countryToGuess', 'win', 'countriesFeatures', 'loading'])
   },
   methods: {
-    ...mapActions(useGameStore, ['addGuess', 'getCountries', 'setLoading']),
+    ...mapActions(useGameStore, ['setLoading']),
     handlePolygonClick(polygon: any): void {
-      if(this.win) return;
-      this.addGuess(polygon.properties.NAME)
-      localStorage.setItem('gameData', JSON.stringify({currentGuesses: this.currentGuesses, country: this.countryToGuess}))
-      this.myGlobe?.polygonCapColor(this.polygonCapColor)
+      this.$emit('countryClick', polygon.properties?.NAME)
     },
     polygonCapColor(polygon: any, hoverPolygon?: any): string {
-      if(this.currentGuesses.includes(polygon.properties.NAME)){
-        if(this.countryToGuess === polygon.properties.NAME) return '#00FF00'
+      if(this.currentGuesses.includes(polygon.properties?.NAME)){
+        if(this.countryToGuess === polygon.properties?.NAME) return '#00FF00'
         return '#FFFF00'
       } else {
         if(!this.win && hoverPolygon && polygon === hoverPolygon) return 'green'

@@ -31,8 +31,18 @@ export const useGameStore = defineStore('game', {
     setLoading(isLoading: Boolean){
       this.loading = isLoading;
     },
+    reset(){
+      this.currentGuesses = [];
+      this.countryToGuess = '';
+      this.win = false;
+    },
+    resetGame(newCountry: string){
+      this.countryToGuess = newCountry;
+      this.currentGuesses = [];
+      this.win = false;
+    },
     getCountries(){
-      return fetch('countries.geojson').then(res => res.json()).then((countries: FeatureCollection) => {
+      return fetch('/countries.geojson').then(res => res.json()).then((countries: FeatureCollection) => {
         this.countriesFeatures = countries.features;
         this.countries = countries.features.map((country) => {
           return country.properties?.NAME

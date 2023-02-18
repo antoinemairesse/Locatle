@@ -17,8 +17,8 @@ export default {
 }
 
 .half-circle-spinner {
-  width: 60px;
-  height: 60px;
+  width: 90px;
+  height: 90px;
   border-radius: 100%;
   position: relative;
 }
@@ -29,7 +29,7 @@ export default {
   width: 100%;
   height: 100%;
   border-radius: 100%;
-  border: calc(60px / 10) solid transparent;
+  border: calc(90px / 10) solid transparent;
 }
 
 .half-circle-spinner .circle.circle-1 {
