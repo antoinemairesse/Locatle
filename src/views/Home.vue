@@ -1,6 +1,5 @@
 <template>
-  <div>Home page</div>
-  <router-link to="/game">Go to game</router-link>
+  <div class="text-center text-2xl mt-4">Home page</div>
 </template>
 
 <script setup lang="ts">
