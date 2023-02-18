@@ -14,10 +14,20 @@
   </nav>
 </template>
 
-<script>
+<script lang="ts">
+
+type Route = {
+  path: string,
+  text: string
+}
+
+type Data = {
+  routes: Array<Route>
+}
+
 export default {
   name: "NavBar",
-  data(){
+  data(): Data {
     return {
       routes: [
         {path: '/game/daily', text: 'Daily guess'},
