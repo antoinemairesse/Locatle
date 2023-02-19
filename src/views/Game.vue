@@ -15,7 +15,7 @@
         <button
           v-if="isPracticeGame"
           class="py-2 px-4 mt-2 bg-blue-600 text-white cursor-pointer rounded z-50 relative"
-          @click="newGame"
+          @click="startGame"
         >
           Play again ?
         </button>
@@ -64,7 +64,6 @@ export default defineComponent({
   watch: {
     '$route.name': {
       handler(){
-        this.reset();
         this.startGame();
       },
       immediate: true,
@@ -105,6 +104,7 @@ export default defineComponent({
       return this.countries[index];
     },
     startGame(): void {
+      this.reset();
       this.getCountries().then(() => {
         if(!this.isPracticeGame){
           this.setCountryToGuess(this.getCountryToGuess())
@@ -113,10 +113,6 @@ export default defineComponent({
           this.setCountryToGuess(this.getRandomCountry())
         }
       })
-    },
-    newGame(){
-      this.reset();
-      this.setCountryToGuess(this.getRandomCountry())
     },
     handleCountryClick(country: string){
       if(this.win) return;
@@ -131,7 +127,6 @@ export default defineComponent({
     }
   },
   mounted() {
-    this.reset();
     this.startGame();
     setInterval(() => {
       this.timeUntilNextGuess = this.updateTimeUntilNextGuess()
