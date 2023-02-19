@@ -42,6 +42,11 @@ export const useGameStore = defineStore('game', {
       this.win = false;
     },
     getCountries(){
+      if(this.countries.length){
+        return new Promise(resolve => {
+          resolve(true)
+        });
+      }
       return fetch('/countries.geojson').then(res => res.json()).then((countries: FeatureCollection) => {
         this.countriesFeatures = countries.features;
         this.countries = countries.features.map((country) => {

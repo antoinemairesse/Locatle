@@ -11,6 +11,7 @@
         <h1 class="text-center text-xl text-green-700 font-semibold m-0">
           You guessed <span class="font-bold">{{countryToGuess}}</span> correctly, GG !
         </h1>
+        <span v-if="win && !isPracticeGame">New daily guess in : {{timeUntilNextGuess}}</span>
         <button
           v-if="isPracticeGame"
           class="py-2 px-4 mt-2 bg-blue-600 text-white cursor-pointer rounded z-50 relative"
@@ -37,7 +38,8 @@ enum GameMode {
 }
 
 type Data = {
-  gameMode: GameMode
+  gameMode: GameMode,
+  timeUntilNextGuess: string
 }
 
 type GameData = {
@@ -49,13 +51,24 @@ export default defineComponent({
   components: {Globe},
   data(): Data {
     return {
-      gameMode: GameMode.daily
+      gameMode: GameMode.daily,
+      timeUntilNextGuess: ''
     }
   },
   computed: {
     ...mapState(useGameStore, ['countryToGuess', 'win', 'countries', 'loading', 'currentGuesses']),
     isPracticeGame(){
       return this.$route.name === 'practiceGame'
+    },
+  },
+  watch: {
+    '$route.name': {
+      handler(){
+        this.reset();
+        this.startGame();
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {
@@ -67,6 +80,14 @@ export default defineComponent({
       if(data.country !== this.countryToGuess)
         localStorage.removeItem('gameData');
       else this.setGuesses(data.currentGuesses);
+    },
+    updateTimeUntilNextGuess(): string {
+      let d = new Date();
+      let h = d.getUTCHours();
+      let m = d.getUTCMinutes();
+      let s = d.getUTCSeconds();
+      let secondsUntilEndOfDate = (24*60*60) - (h*60*60) - (m*60) - s;
+      return new Date(secondsUntilEndOfDate * 1000).toISOString().slice(11, 19);
     },
     getCountryToGuess(): string {
       const dateObj = new Date();
@@ -112,6 +133,9 @@ export default defineComponent({
   mounted() {
     this.reset();
     this.startGame();
+    setInterval(() => {
+      this.timeUntilNextGuess = this.updateTimeUntilNextGuess()
+    }, 1000);
   }
 })
 </script>

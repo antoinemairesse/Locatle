@@ -1,7 +1,7 @@
 <template>
   <div class="absolute m-auto top-0 left-0 bottom-0 right-0 w-fit flex items-center">
     <Loader v-if="loading"/>
-    <div class="cursor-grab" :class="{'hidden': loading}" ref="canvas" id="canvas"/>
+    <div class="cursor-grab" :class="{'absolute invisible': loading}" ref="canvas" id="canvas"/>
   </div>
 </template>
 <script lang="ts">
@@ -64,28 +64,34 @@ export default defineComponent({
         return `<b class="${className}">${polygon.properties.ADMIN}</b>`
       }
       return ''
+    },
+    renderGlobe() {
+      this.myGlobe = Globe()(document.getElementById('canvas') as HTMLElement)
+        .backgroundColor("#FFFFFF00")
+        .polygonsData(this.countriesFeatures)
+        .globeImageUrl(import.meta.env.VITE_EARTH_PATH)
+        .pointOfView({ lat: 27.53, lng: 17.75, altitude: 1.42 })
+        .polygonSideColor(() => 'rgb(119,136,153)')
+        .polygonStrokeColor(() => '#000000')
+        .polygonCapColor(() => '#00000000')
+        .width(600).height(600)
+        .onPolygonHover(hoverD => {
+          return this.myGlobe?.polygonCapColor(d => this.polygonCapColor(d, hoverD))
+        })
+        .polygonLabel((polygon): string => this.formatCountryLabel(polygon))
+        .onPolygonClick(this.handlePolygonClick)
+        .onGlobeReady(() => {
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.setLoading(false);
+            })
+          })
+        })
     }
   },
   mounted(): void {
     this.setLoading(true);
-    const myGlobe = Globe();
-    this.myGlobe = myGlobe;
-    myGlobe(this.$refs.canvas as HTMLElement)
-      .backgroundColor("#FFFFFF00")
-      .globeImageUrl(import.meta.env.VITE_EARTH_PATH)
-      .polygonSideColor(() => 'rgb(119,136,153)')
-      .polygonStrokeColor(() => '#000000')
-      .polygonCapColor(() => '#00000000')
-      .width(600).height(600)
-      .onPolygonHover(hoverD => {
-        return myGlobe.polygonCapColor(d => this.polygonCapColor(d, hoverD))
-      })
-      .polygonLabel((polygon): string => this.formatCountryLabel(polygon))
-      .onPolygonClick(this.handlePolygonClick)
-      .onGlobeReady(() => {
-        myGlobe.pointOfView({lat: 27.53, lng: 17.75, altitude: 1.42})
-        this.setLoading(false);
-      })
+    this.renderGlobe();
   }
 })
 </script>
